@@ -3,6 +3,7 @@ package org.poem.utils;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.poem.utils.excel.ExcelUtils;
+import org.poem.utils.vo.PathVO;
 import org.poem.utils.vo.TableVO;
 
 import java.io.File;
@@ -19,18 +20,13 @@ import static org.poem.utils.Strings.*;
 public class VOCreateUtils {
 
 
-
-    public static void main(String[] args) throws Exception {
-        getCreateVOAndService(new File("platform.xls"), "tmp");
-    }
-
     /**
      * 创建文件目录
      *
      * @param path
      * @throws IOException
      */
-    public static void creatFile(String path) throws IOException {
+    private static void createFile(String path) throws IOException {
         //文件存放path
 
         File file = new File(path);
@@ -49,13 +45,14 @@ public class VOCreateUtils {
      * 创建vo
      *
      * @param table
-     * @param packageName
+     * @param pathVO
+     * @throws IOException
      */
-    public static void createVO(TableVO table, String packageName) throws IOException {
+    private static void createVO(TableVO table, PathVO pathVO) throws IOException {
         String sheetChineseName = table.getChineseName();
         String tableName = table.getTableName();
         StringBuffer sqlBuf = new StringBuffer();
-        sqlBuf.append("package " + packageName + ";\n" +
+        sqlBuf.append("package " + pathVO.getPackages() + ";\n" +
                 "\n" +
                 "import io.swagger.annotations.Api;\n" +
                 "import io.swagger.annotations.ApiModelProperty;\n" +
@@ -74,8 +71,9 @@ public class VOCreateUtils {
         }
         sqlBuf.append(String.join("\n", fields));
         sqlBuf.append("\n}\n");
-        String path = packageName + File.separator + "vo" + File.separator + getPath(tableName) + File.separator + TableName(tableName) + "VO.java";
-        creatFile(path);
+        String path = pathVO.getPath() + File.separator + pathVO.getPackages().replaceAll("\\.", File.separator)
+                + File.separator + "vo" + File.separator + getPath(tableName) + File.separator + TableName(tableName) + "VO.java";
+        createFile(path);
         IOUtils.write(sqlBuf, new FileOutputStream(new File(path)));
     }
 
@@ -84,13 +82,14 @@ public class VOCreateUtils {
      * 创建vo
      *
      * @param table
-     * @param packageName
+     * @param pathVO
+     * @throws IOException
      */
-    public static void createService(TableVO table, String packageName) throws IOException {
+    private static void createService(TableVO table, PathVO pathVO) throws IOException {
         String sheetChineseName = table.getChineseName();
         String tableName = table.getTableName();
         StringBuffer sqlBuf = new StringBuffer();
-        sqlBuf.append("package " + packageName + ";\n" +
+        sqlBuf.append("package " + pathVO.getPackages() + ";\n" +
                 "\n" +
                 "import org.springframework.stereotype.Service;\n" +
                 "/**\n" +
@@ -100,8 +99,9 @@ public class VOCreateUtils {
                 "@Service\n");
         sqlBuf.append("public class " + TableName(tableName) + "Service {\n\n");
         sqlBuf.append("\n}\n");
-        String path = packageName + File.separator + "service" + File.separator + getPath(tableName) + File.separator + TableName(tableName) + "Service.java";
-        creatFile(path);
+        String path = pathVO.getPath() + File.separator + pathVO.getPackages().replaceAll("\\.", File.separator)
+                + File.separator + "service" + File.separator + getPath(tableName) + File.separator + TableName(tableName) + "Service.java";
+        createFile(path);
         IOUtils.write(sqlBuf, new FileOutputStream(new File(path)));
     }
 
@@ -109,13 +109,14 @@ public class VOCreateUtils {
      * 创建vo
      *
      * @param table
-     * @param packageName
+     * @param pathVO
+     * @throws IOException
      */
-    public static void createController(TableVO table, String packageName) throws IOException {
+    private static void createController(TableVO table, PathVO pathVO) throws IOException {
         String sheetChineseName = table.getChineseName();
         String tableName = table.getTableName();
         StringBuffer sqlBuf = new StringBuffer();
-        sqlBuf.append("package " + packageName + ";\n" +
+        sqlBuf.append("package " + pathVO.getPackages() + ";\n" +
                 "\n" +
                 "import io.swagger.annotations.Api;\n" +
                 "import org.springframework.web.bind.annotation.RequestMapping;\n" +
@@ -124,13 +125,14 @@ public class VOCreateUtils {
                 " * " + sheetChineseName + "\n" +
                 " * @author poem\n" +
                 " */\n" +
-                "@RestController" +
+                "@RestController\n" +
                 "@RequestMapping(\"/v1/" + getPath(tableName) + "\")\n" +
                 "@Api(value = \"/v1/" + getPath(tableName) + "\",tags = {\"" + sheetChineseName + "\"})\n");
         sqlBuf.append("public class " + TableName(tableName) + "Controller {\n\n");
         sqlBuf.append("\n}\n");
-        String path = packageName + File.separator + "controller" + File.separator + getPath(tableName) + File.separator + TableName(tableName) + "Controller.java";
-        creatFile(path);
+        String path = pathVO.getPath() + File.separator + pathVO.getPackages().replaceAll("\\.", File.separator)
+                + File.separator + "controller" + File.separator + getPath(tableName) + File.separator + TableName(tableName) + "Controller.java";
+        createFile(path);
         IOUtils.write(sqlBuf, new FileOutputStream(new File(path)));
     }
 
@@ -139,13 +141,13 @@ public class VOCreateUtils {
      *
      * @throws Exception
      */
-    public static void getCreateVOAndService(File file, String packageName) throws Exception {
+    public static void getCreateVOAndService(File file, PathVO pathVO) throws Exception {
 
         List<TableVO> tables = ExcelUtils.readExcel(file);
         for (TableVO table : tables) {
-            createVO(table, packageName);
-            createController(table, packageName);
-            createService(table, packageName);
+            createVO(table, pathVO);
+//            createController(table, pathVO);
+//            createService(table, pathVO);
         }
 
     }
