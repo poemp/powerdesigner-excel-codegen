@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+}
+
+group 'org.poem'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+
+repositories {
+    flatDir {
+        dirs "$rootProject.projectDir/libs"
+    }
+    //为了加载Finchley.M7版本引入的maven仓库
+    maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+    maven { url "https://repo.spring.io/libs-milestone" }
+    jcenter()
+    mavenCentral()
+    mavenLocal()
+}
+
+
+
+ext {
+    fileuploadVersion = "1.3.2"
+    poiVersion = "3.17"
+    poiOoxmlVersion = "3.17"
+    fastJsonVersion="1.2.12"
+}
+
+dependencies {
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
+    compile("org.apache.poi:poi-ooxml:${poiOoxmlVersion}")
+    compile("org.apache.poi:poi:${poiVersion}")
+    compile fileTree(dir:'../libs',include:['*jar'])
+    compile group: 'com.google.guava', name: 'guava', version: '27.0-jre'
+    compile group: 'commons-io', name: 'commons-io', version: '2.2'
+    compile("com.alibaba:fastjson:${fastJsonVersion}")
+}
