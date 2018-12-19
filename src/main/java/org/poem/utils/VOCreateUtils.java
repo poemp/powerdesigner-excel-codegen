@@ -146,8 +146,8 @@ public class VOCreateUtils {
         List<TableVO> tables = ExcelUtils.readExcel(file);
         for (TableVO table : tables) {
             createVO(table, pathVO);
-//            createController(table, pathVO);
-//            createService(table, pathVO);
+            createController(table, pathVO);
+            createService(table, pathVO);
         }
 
     }
